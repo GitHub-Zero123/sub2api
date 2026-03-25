@@ -37,7 +37,7 @@
               <!-- User Dropdown -->
               <div
                 v-if="showFilterUserDropdown && (filterUserResults.length > 0 || filterUserKeyword)"
-                class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[var(--app-border)] bg-[rgba(12,12,13,0.98)] shadow-[0_18px_40px_rgba(0,0,0,0.32)]"
               >
                 <div
                   v-if="filterUserLoading"
@@ -56,10 +56,10 @@
                   :key="user.id"
                   type="button"
                   @click="selectFilterUser(user)"
-                  class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                  class="w-full px-4 py-2 text-left text-sm text-[var(--app-text)] hover:bg-white/5"
                 >
-                  <span class="font-medium text-gray-900 dark:text-white">{{ user.email }}</span>
-                  <span class="ml-2 text-gray-500 dark:text-gray-400">#{{ user.id }}</span>
+                  <span class="font-medium text-[var(--app-text)]">{{ user.email }}</span>
+                  <span class="ml-2 text-[var(--app-text-muted)]">#{{ user.id }}</span>
                 </button>
               </div>
             </div>
@@ -116,27 +116,27 @@
               <!-- Dropdown menu -->
               <div
                 v-if="showColumnDropdown"
-                class="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                class="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-lg border border-[var(--app-border)] bg-[rgba(12,12,13,0.98)] shadow-[0_18px_40px_rgba(0,0,0,0.32)]"
               >
                 <div class="p-2">
                   <!-- User column mode selection -->
-                  <div class="mb-2 border-b border-gray-200 pb-2 dark:border-gray-700">
-                    <div class="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                  <div class="mb-2 border-b border-white/6 pb-2">
+                    <div class="px-3 py-1 text-xs font-medium text-[var(--app-text-muted)]">
                       {{ t('admin.subscriptions.columns.user') }}
                     </div>
                     <button
                       @click="setUserColumnMode('email')"
-                      class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                      class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-[var(--app-text)] hover:bg-white/5"
                     >
                       <span>{{ t('admin.users.columns.email') }}</span>
-                      <Icon v-if="userColumnMode === 'email'" name="check" size="sm" class="text-primary-500" />
+                      <Icon v-if="userColumnMode === 'email'" name="check" size="sm" class="text-[var(--app-text-soft)]" />
                     </button>
                     <button
                       @click="setUserColumnMode('username')"
-                      class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                      class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-[var(--app-text)] hover:bg-white/5"
                     >
                       <span>{{ t('admin.users.columns.username') }}</span>
-                      <Icon v-if="userColumnMode === 'username'" name="check" size="sm" class="text-primary-500" />
+                      <Icon v-if="userColumnMode === 'username'" name="check" size="sm" class="text-[var(--app-text-soft)]" />
                     </button>
                   </div>
                   <!-- Other columns toggle -->
@@ -144,10 +144,10 @@
                     v-for="col in toggleableColumns"
                     :key="col.key"
                     @click="toggleColumn(col.key)"
-                    class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                    class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-[var(--app-text)] hover:bg-white/5"
                   >
                     <span>{{ col.label }}</span>
-                    <Icon v-if="isColumnVisible(col.key)" name="check" size="sm" class="text-primary-500" />
+                    <Icon v-if="isColumnVisible(col.key)" name="check" size="sm" class="text-[var(--app-text-soft)]" />
                   </button>
                 </div>
               </div>
@@ -179,9 +179,9 @@
           <template #cell-user="{ row }">
             <div class="flex items-center gap-2">
               <div
-                class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30"
+                class="flex h-8 w-8 items-center justify-center rounded-full border border-white/8 bg-white/5"
               >
-                <span class="text-sm font-medium text-primary-700 dark:text-primary-300">
+                <span class="text-sm font-medium text-[var(--app-text)]">
                   {{ userColumnMode === 'email'
                     ? (row.user?.email?.charAt(0).toUpperCase() || '?')
                     : (row.user?.username?.charAt(0).toUpperCase() || '?')
@@ -215,7 +215,7 @@
               <div v-if="row.group?.daily_limit_usd" class="usage-row">
                 <div class="flex items-center gap-2">
                   <span class="usage-label">{{ t('admin.subscriptions.daily') }}</span>
-                  <div class="h-1.5 flex-1 rounded-full bg-gray-200 dark:bg-dark-600">
+                  <div class="h-1.5 flex-1 rounded-full bg-white/10">
                     <div
                       class="h-1.5 rounded-full transition-all"
                       :class="getProgressClass(row.daily_usage_usd, row.group?.daily_limit_usd)"
@@ -252,7 +252,7 @@
               <div v-if="row.group?.weekly_limit_usd" class="usage-row">
                 <div class="flex items-center gap-2">
                   <span class="usage-label">{{ t('admin.subscriptions.weekly') }}</span>
-                  <div class="h-1.5 flex-1 rounded-full bg-gray-200 dark:bg-dark-600">
+                  <div class="h-1.5 flex-1 rounded-full bg-white/10">
                     <div
                       class="h-1.5 rounded-full transition-all"
                       :class="getProgressClass(row.weekly_usage_usd, row.group?.weekly_limit_usd)"
@@ -289,7 +289,7 @@
               <div v-if="row.group?.monthly_limit_usd" class="usage-row">
                 <div class="flex items-center gap-2">
                   <span class="usage-label">{{ t('admin.subscriptions.monthly') }}</span>
-                  <div class="h-1.5 flex-1 rounded-full bg-gray-200 dark:bg-dark-600">
+                  <div class="h-1.5 flex-1 rounded-full bg-white/10">
                     <div
                       class="h-1.5 rounded-full transition-all"
                       :class="getProgressClass(row.monthly_usage_usd, row.group?.monthly_limit_usd)"
@@ -329,10 +329,10 @@
                   !row.group?.weekly_limit_usd &&
                   !row.group?.monthly_limit_usd
                 "
-                class="flex items-center gap-2 rounded-lg bg-gradient-to-r from-emerald-50 to-teal-50 px-3 py-2 dark:from-emerald-900/20 dark:to-teal-900/20"
+                class="flex items-center gap-2 rounded-lg border border-white/8 bg-white/4 px-3 py-2"
               >
-                <span class="text-lg text-emerald-600 dark:text-emerald-400">∞</span>
-                <span class="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                <span class="text-lg text-[var(--app-text-soft)]">∞</span>
+                <span class="text-xs font-medium text-[var(--app-text-soft)]">
                   {{ t('admin.subscriptions.unlimited') }}
                 </span>
               </div>
@@ -380,7 +380,7 @@
               <button
                 v-if="row.status === 'active' || row.status === 'expired'"
                 @click="handleExtend(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-[var(--app-text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--app-text)]"
               >
                 <Icon name="calendar" size="sm" />
                 <span class="text-xs">{{ t('admin.subscriptions.adjust') }}</span>
@@ -389,7 +389,7 @@
                 v-if="row.status === 'active'"
                 @click="handleResetQuota(row)"
                 :disabled="resettingQuota && resettingSubscription?.id === row.id"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-900/20 dark:hover:text-orange-400 disabled:cursor-not-allowed disabled:opacity-50"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-[var(--app-text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--app-text)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Icon name="refresh" size="sm" />
                 <span class="text-xs">{{ t('admin.subscriptions.resetQuota') }}</span>
@@ -397,7 +397,7 @@
               <button
                 v-if="row.status === 'active'"
                 @click="handleRevoke(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-[var(--app-text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--app-text)]"
               >
                 <Icon name="ban" size="sm" />
                 <span class="text-xs">{{ t('admin.subscriptions.revoke') }}</span>
@@ -463,7 +463,7 @@
             <!-- User Dropdown -->
             <div
               v-if="showUserDropdown && (userSearchResults.length > 0 || userSearchKeyword)"
-              class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+              class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[var(--app-border)] bg-[rgba(12,12,13,0.98)] shadow-[0_18px_40px_rgba(0,0,0,0.32)]"
             >
               <div
                 v-if="userSearchLoading"

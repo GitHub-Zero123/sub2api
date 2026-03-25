@@ -15,15 +15,15 @@
     </template>
 
     <template v-else-if="!data || data.length === 0">
-      <div class="rounded-lg border border-gray-200 bg-white p-12 text-center dark:border-dark-700 dark:bg-dark-900">
+      <div class="rounded-lg border border-[var(--app-border)] bg-[var(--app-bg-elevated)] p-12 text-center shadow-[var(--app-shadow-sm)]">
         <slot name="empty">
           <div class="flex flex-col items-center">
             <Icon
               name="inbox"
               size="xl"
-              class="mb-4 h-12 w-12 text-gray-400 dark:text-dark-500"
+              class="mb-4 h-12 w-12 text-[var(--app-text-muted)]"
             />
-            <p class="text-lg font-medium text-gray-900 dark:text-gray-100">
+            <p class="text-lg font-medium text-[var(--app-text)]">
               {{ t('empty.noData') }}
             </p>
           </div>

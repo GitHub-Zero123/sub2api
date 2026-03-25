@@ -1,52 +1,57 @@
 <template>
   <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-    <div class="card p-4 flex items-center gap-3">
-      <div class="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30 text-blue-600">
+    <div class="card flex items-center gap-3 p-4">
+      <div class="stat-icon">
         <Icon name="document" size="md" />
       </div>
       <div>
-        <p class="text-xs font-medium text-gray-500">{{ t('usage.totalRequests') }}</p>
-        <p class="text-xl font-bold">{{ stats?.total_requests?.toLocaleString() || '0' }}</p>
-        <p class="text-xs text-gray-400">{{ t('usage.inSelectedRange') }}</p>
+        <p class="text-xs font-medium text-[var(--app-text-muted)]">{{ t('usage.totalRequests') }}</p>
+        <p class="text-xl font-bold text-[var(--app-text)]">{{ stats?.total_requests?.toLocaleString() || '0' }}</p>
+        <p class="text-xs text-[var(--app-text-muted)]">{{ t('usage.inSelectedRange') }}</p>
       </div>
     </div>
-    <div class="card p-4 flex items-center gap-3">
-      <div class="rounded-lg bg-amber-100 p-2 dark:bg-amber-900/30 text-amber-600"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" /></svg></div>
+    <div class="card flex items-center gap-3 p-4">
+      <div class="stat-icon">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" /></svg>
+      </div>
       <div>
-        <p class="text-xs font-medium text-gray-500">{{ t('usage.totalTokens') }}</p>
-        <p class="text-xl font-bold">{{ formatTokens(stats?.total_tokens || 0) }}</p>
-        <p class="text-xs text-gray-500">
+        <p class="text-xs font-medium text-[var(--app-text-muted)]">{{ t('usage.totalTokens') }}</p>
+        <p class="text-xl font-bold text-[var(--app-text)]">{{ formatTokens(stats?.total_tokens || 0) }}</p>
+        <p class="text-xs text-[var(--app-text-soft)]">
           {{ t('usage.in') }}: {{ formatTokens(stats?.total_input_tokens || 0) }} /
           {{ t('usage.out') }}: {{ formatTokens(stats?.total_output_tokens || 0) }}
         </p>
       </div>
     </div>
-    <div class="card p-4 flex items-center gap-3">
-      <div class="rounded-lg bg-green-100 p-2 dark:bg-green-900/30 text-green-600">
+    <div class="card flex items-center gap-3 p-4">
+      <div class="stat-icon">
         <Icon name="dollar" size="md" />
       </div>
       <div class="min-w-0 flex-1">
-        <p class="text-xs font-medium text-gray-500">{{ t('usage.totalCost') }}</p>
-        <p class="text-xl font-bold text-green-600">
+        <p class="text-xs font-medium text-[var(--app-text-muted)]">{{ t('usage.totalCost') }}</p>
+        <p class="text-xl font-bold text-[var(--app-text)]">
           ${{ ((stats?.total_account_cost ?? stats?.total_actual_cost) || 0).toFixed(4) }}
         </p>
-        <p class="text-xs text-gray-400" v-if="stats?.total_account_cost != null">
+        <p class="text-xs text-[var(--app-text-muted)]" v-if="stats?.total_account_cost != null">
           {{ t('usage.userBilled') }}:
-          <span class="text-gray-300">${{ (stats?.total_actual_cost || 0).toFixed(4) }}</span>
+          <span class="text-[var(--app-text-soft)]">${{ (stats?.total_actual_cost || 0).toFixed(4) }}</span>
           · {{ t('usage.standardCost') }}:
-          <span class="text-gray-300">${{ (stats?.total_cost || 0).toFixed(4) }}</span>
+          <span class="text-[var(--app-text-soft)]">${{ (stats?.total_cost || 0).toFixed(4) }}</span>
         </p>
-        <p class="text-xs text-gray-400" v-else>
+        <p class="text-xs text-[var(--app-text-muted)]" v-else>
           {{ t('usage.standardCost') }}:
-          <span class="line-through">${{ (stats?.total_cost || 0).toFixed(4) }}</span>
+          <span class="line-through text-[var(--app-text-soft)]">${{ (stats?.total_cost || 0).toFixed(4) }}</span>
         </p>
       </div>
     </div>
-    <div class="card p-4 flex items-center gap-3">
-      <div class="rounded-lg bg-purple-100 p-2 dark:bg-purple-900/30 text-purple-600">
+    <div class="card flex items-center gap-3 p-4">
+      <div class="stat-icon">
         <Icon name="clock" size="md" />
       </div>
-      <div><p class="text-xs font-medium text-gray-500">{{ t('usage.avgDuration') }}</p><p class="text-xl font-bold">{{ formatDuration(stats?.average_duration_ms || 0) }}</p></div>
+      <div>
+        <p class="text-xs font-medium text-[var(--app-text-muted)]">{{ t('usage.avgDuration') }}</p>
+        <p class="text-xl font-bold text-[var(--app-text)]">{{ formatDuration(stats?.average_duration_ms || 0) }}</p>
+      </div>
     </div>
   </div>
 </template>

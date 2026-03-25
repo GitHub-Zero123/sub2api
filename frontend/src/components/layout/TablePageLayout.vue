@@ -60,9 +60,9 @@ onUnmounted(() => {
 
 /* 表格滚动容器 - 增强版表体滚动方案 */
 .table-scroll-container {
-  @apply flex flex-col overflow-hidden h-full rounded-2xl shadow-sm;
-  background: var(--app-bg-elevated);
-  border: 1px solid var(--app-border);
+  @apply flex flex-col overflow-hidden h-full rounded-xl shadow-sm;
+  @apply bg-white dark:bg-dark-800;
+  @apply border border-gray-200 dark:border-dark-700;
 }
 
 .table-scroll-container :deep(.table-wrapper) {
@@ -79,7 +79,7 @@ onUnmounted(() => {
 
 .table-scroll-container :deep(thead) {
   @apply backdrop-blur-sm;
-  background: var(--app-bg-panel);
+  @apply bg-gray-50 dark:bg-dark-800/50;
 }
 
 .table-scroll-container :deep(tbody) {
@@ -88,14 +88,14 @@ onUnmounted(() => {
 
 .table-scroll-container :deep(th) {
   @apply px-5 py-4 text-left text-sm font-medium border-b;
-  color: var(--app-text-soft);
-  border-color: var(--app-border);
+  @apply text-gray-600 dark:text-dark-300;
+  @apply border-gray-200 dark:border-dark-700;
 }
 
 .table-scroll-container :deep(td) {
   @apply px-5 py-4 text-sm border-b;
-  color: var(--app-text);
-  border-color: var(--app-border);
+  @apply text-gray-700 dark:text-gray-300;
+  @apply border-gray-100 dark:border-dark-800;
 }
 
 /* 移动端：恢复正常滚动 */

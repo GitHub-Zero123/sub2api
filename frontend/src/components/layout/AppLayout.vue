@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-[var(--app-bg)] text-[var(--app-text)]">
+  <div class="min-h-screen bg-gray-50 text-gray-900 dark:bg-dark-950 dark:text-gray-100">
     <!-- Background Decoration -->
-    <div class="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.06),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent_35%),linear-gradient(180deg,#050505_0%,#09090a_45%,#040404_100%)]"></div>
-    <div class="pointer-events-none fixed inset-0 opacity-40 [background-image:linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:56px_56px]"></div>
+    <div class="pointer-events-none fixed inset-0 bg-gradient-to-b from-gray-100 via-gray-50 to-gray-100 dark:from-dark-950 dark:via-dark-900 dark:to-dark-950"></div>
+    <div class="pointer-events-none fixed inset-0 opacity-30 dark:opacity-40 [background-image:linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] dark:[background-image:linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:56px_56px]"></div>
 
     <!-- Sidebar -->
     <AppSidebar />

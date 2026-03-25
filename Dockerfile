@@ -28,8 +28,9 @@ COPY frontend/package.json frontend/pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 # Copy frontend source and build
+# Use build:no-check to skip vue-tsc type checking (saves ~400MB heap on low-memory servers)
 COPY frontend/ ./
-RUN NODE_OPTIONS="--max-old-space-size=2048" pnpm run build
+RUN NODE_OPTIONS="--max-old-space-size=1536" pnpm run build:no-check
 
 # -----------------------------------------------------------------------------
 # Stage 2: Backend Builder

@@ -4,8 +4,9 @@
 import axios from 'axios'
 
 // Create a separate client for setup endpoints (not under /api/v1)
+// Use relative path to support subpath deployment
 const setupClient = axios.create({
-  baseURL: '',
+  baseURL: import.meta.env.BASE_URL || '/',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json'

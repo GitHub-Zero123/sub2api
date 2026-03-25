@@ -656,7 +656,8 @@ async function waitForServiceRestart() {
           serviceReady.value = true
           // Redirect to login page after a short delay
           setTimeout(() => {
-            window.location.href = '/login'
+            const basePath = import.meta.env.BASE_URL || '/'
+            window.location.href = basePath + (basePath.endsWith('/') ? '' : '/') + 'login'
           }, 1500)
           return
         }

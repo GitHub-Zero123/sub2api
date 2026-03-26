@@ -27,6 +27,8 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+      args:
+        VITE_BASE_PATH: ${VITE_BASE_PATH:-/}
     image: sub2api-local:latest
     container_name: sub2api
     restart: unless-stopped

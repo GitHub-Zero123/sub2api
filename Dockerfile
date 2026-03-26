@@ -12,11 +12,15 @@ ARG ALPINE_IMAGE=alpine:3.21
 ARG POSTGRES_IMAGE=postgres:18-alpine
 ARG GOPROXY=https://goproxy.cn,direct
 ARG GOSUMDB=sum.golang.google.cn
+ARG VITE_BASE_PATH=/
 
 # -----------------------------------------------------------------------------
 # Stage 1: Frontend Builder
 # -----------------------------------------------------------------------------
 FROM ${NODE_IMAGE} AS frontend-builder
+
+ARG VITE_BASE_PATH
+ENV VITE_BASE_PATH=${VITE_BASE_PATH}
 
 WORKDIR /app/frontend
 

@@ -9,7 +9,8 @@ import { getLocale } from '@/i18n'
 
 // ==================== Axios Instance Configuration ====================
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1'
+const BASE_URL = import.meta.env.BASE_URL || '/'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || `${BASE_URL.replace(/\/$/, '')}/api/v1`
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,

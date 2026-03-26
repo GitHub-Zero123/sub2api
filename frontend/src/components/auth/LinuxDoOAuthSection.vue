@@ -52,7 +52,9 @@ const { t } = useI18n()
 
 function startLogin(): void {
   const redirectTo = (route.query.redirect as string) || '/dashboard'
-  const apiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined) || '/api/v1'
+  const baseUrl = import.meta.env.BASE_URL || '/'
+  const apiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined)
+    || `${baseUrl.replace(/\/$/, '')}/api/v1`
   const normalized = apiBase.replace(/\/$/, '')
   const startURL = `${normalized}/auth/oauth/linuxdo/start?redirect=${encodeURIComponent(redirectTo)}`
   window.location.href = startURL

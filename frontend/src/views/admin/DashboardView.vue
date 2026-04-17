@@ -111,8 +111,7 @@
                 <p class="text-xs text-[var(--app-text-soft)]">
                   <span :title="t('admin.dashboard.actual')">${{ formatCost(stats.today_actual_cost) }}</span>
                   <span :title="t('admin.dashboard.standard')">
-                    / ${{ formatCost(stats.today_cost) }}</span
-                  >
+                    / ${{ formatCost(stats.today_cost) }}</span>
                 </p>
               </div>
             </div>
@@ -134,8 +133,7 @@
                 <p class="text-xs text-[var(--app-text-soft)]">
                   <span :title="t('admin.dashboard.actual')">${{ formatCost(stats.total_actual_cost) }}</span>
                   <span :title="t('admin.dashboard.standard')">
-                    / ${{ formatCost(stats.total_cost) }}</span
-                  >
+                    / ${{ formatCost(stats.total_cost) }}</span>
                 </p>
               </div>
             </div>
@@ -203,6 +201,9 @@
                   @change="onDateRangeChange"
                 />
               </div>
+              <button @click="loadDashboardStats" :disabled="chartsLoading" class="btn btn-secondary">
+                {{ t('common.refresh') }}
+              </button>
               <div class="ml-auto flex items-center gap-2">
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
                   >{{ t('admin.dashboard.granularity') }}:</span

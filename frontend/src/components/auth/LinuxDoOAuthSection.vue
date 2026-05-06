@@ -42,9 +42,11 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { resolveAffiliateReferralCode, storeOAuthAffiliateCode } from '@/utils/oauthAffiliate'
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   disabled?: boolean
+  affCode?: string
   showDivider?: boolean
 }>(), {
   showDivider: true
@@ -58,6 +60,7 @@ function startLogin(): void {
   const baseUrl = import.meta.env.BASE_URL || '/'
   const apiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined)
     || `${baseUrl.replace(/\/$/, '')}/api/v1`
+  storeOAuthAffiliateCode(resolveAffiliateReferralCode(props.affCode, route.query.aff, route.query.aff_code))
   const normalized = apiBase.replace(/\/$/, '')
   const startURL = `${normalized}/auth/oauth/linuxdo/start?redirect=${encodeURIComponent(redirectTo)}`
   window.location.href = startURL

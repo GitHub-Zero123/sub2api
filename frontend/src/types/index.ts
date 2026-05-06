@@ -122,6 +122,33 @@ export interface RegisterRequest {
   turnstile_token?: string
   promo_code?: string
   invitation_code?: string
+  aff_code?: string
+}
+
+export interface AffiliateInvitee {
+  user_id: number
+  email: string
+  username: string
+  created_at?: string
+  total_rebate: number
+}
+
+export interface UserAffiliateDetail {
+  user_id: number
+  aff_code: string
+  inviter_id?: number | null
+  aff_count: number
+  aff_quota: number
+  aff_frozen_quota: number
+  aff_history_quota: number
+  /** 当前用户作为邀请人时实际生效的返利比例（专属覆盖全局）。0-100。 */
+  effective_rebate_rate_percent: number
+  invitees: AffiliateInvitee[]
+}
+
+export interface AffiliateTransferResponse {
+  transferred_quota: number
+  balance: number
 }
 
 export interface SendVerifyCodeRequest {
@@ -189,6 +216,7 @@ export interface PublicSettings {
   channel_monitor_enabled: boolean
   channel_monitor_default_interval_seconds: number
   available_channels_enabled: boolean
+  affiliate_enabled: boolean
 }
 
 export interface AuthResponse {
@@ -464,7 +492,10 @@ export interface Group {
   daily_limit_usd: number | null
   weekly_limit_usd: number | null
   monthly_limit_usd: number | null
-  // 图片生成计费配置（仅 antigravity 平台使用）
+  // 图片生成计费配置
+  allow_image_generation: boolean
+  image_rate_independent: boolean
+  image_rate_multiplier: number
   image_price_1k: number | null
   image_price_2k: number | null
   image_price_4k: number | null
@@ -574,6 +605,9 @@ export interface CreateGroupRequest {
   daily_limit_usd?: number | null
   weekly_limit_usd?: number | null
   monthly_limit_usd?: number | null
+  allow_image_generation?: boolean
+  image_rate_independent?: boolean
+  image_rate_multiplier?: number
   image_price_1k?: number | null
   image_price_2k?: number | null
   image_price_4k?: number | null
@@ -599,6 +633,9 @@ export interface UpdateGroupRequest {
   daily_limit_usd?: number | null
   weekly_limit_usd?: number | null
   monthly_limit_usd?: number | null
+  allow_image_generation?: boolean
+  image_rate_independent?: boolean
+  image_rate_multiplier?: number
   image_price_1k?: number | null
   image_price_2k?: number | null
   image_price_4k?: number | null
@@ -615,7 +652,7 @@ export interface UpdateGroupRequest {
 // ==================== Account & Proxy Types ====================
 
 export type AccountPlatform = 'anthropic' | 'openai' | 'gemini' | 'antigravity'
-export type AccountType = 'oauth' | 'setup-token' | 'apikey' | 'upstream' | 'bedrock'
+export type AccountType = 'oauth' | 'setup-token' | 'apikey' | 'upstream' | 'bedrock' | 'service_account'
 export type OAuthAddMethod = 'oauth' | 'setup-token'
 export type ProxyProtocol = 'http' | 'https' | 'socks5' | 'socks5h'
 
@@ -744,8 +781,8 @@ export interface Account {
   platform: AccountPlatform
   type: AccountType
   credentials?: Record<string, unknown>
-  // Extra fields including Codex usage and model-level rate limits (Antigravity smart retry)
-  extra?: (CodexUsageSnapshot & {
+  // Extra fields including Codex usage, OpenAI compact capability, and model-level rate limits.
+  extra?: (CodexUsageSnapshot & OpenAICompactState & {
     model_rate_limits?: Record<string, { rate_limited_at: string; rate_limit_reset_at: string }>
     antigravity_credits_overages?: Record<string, { activated_at: string; active_until: string }>
   } & Record<string, unknown>)
@@ -915,6 +952,16 @@ export interface CodexUsageSnapshot {
   codex_7d_window_minutes?: number // 7d window in minutes (should be ~10080)
 
   codex_usage_updated_at?: string // Last update timestamp
+}
+
+export type OpenAICompactMode = 'auto' | 'force_on' | 'force_off'
+
+export interface OpenAICompactState {
+  openai_compact_mode?: OpenAICompactMode
+  openai_compact_supported?: boolean
+  openai_compact_checked_at?: string
+  openai_compact_last_status?: number
+  openai_compact_last_error?: string
 }
 
 export interface CreateAccountRequest {

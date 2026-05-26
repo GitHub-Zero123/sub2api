@@ -6,24 +6,83 @@
   <title>API Key 用量查询</title>
   <style>
     :root {
-      color-scheme: light;
+      color-scheme: light dark;
       --bg: #f6f7fb;
       --panel: #ffffff;
       --panel-soft: #f9fafb;
+      --input-bg: #ffffff;
+      --badge-bg: #ffffff;
       --text: #172033;
       --muted: #667085;
+      --label: #344054;
       --line: #d9dee8;
       --primary: #2563eb;
       --primary-strong: #1d4ed8;
       --green: #0f8a5f;
       --amber: #b45309;
       --red: #c2410c;
+      --meter-bg: #e7ebf2;
+      --empty-bg: rgba(255, 255, 255, 0.55);
+      --raw-bg: #111827;
+      --raw-text: #d1d5db;
       --shadow: 0 14px 40px rgba(23, 32, 51, 0.08);
     }
 
-    * {
-      box-sizing: border-box;
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #050505;
+        --panel: #101010;
+        --panel-soft: #181818;
+        --input-bg: #080808;
+        --badge-bg: #151515;
+        --text: #f4f4f5;
+        --muted: #a1a1aa;
+        --label: #d4d4d8;
+        --line: #2a2a2a;
+        --primary: #60a5fa;
+        --primary-strong: #3b82f6;
+        --green: #34d399;
+        --amber: #fbbf24;
+        --red: #fb7185;
+        --meter-bg: #262626;
+        --empty-bg: rgba(16, 16, 16, 0.72);
+        --raw-bg: #000000;
+        --raw-text: #d1d5db;
+        --shadow: 0 18px 46px rgba(0, 0, 0, 0.32);
+      }
     }
+
+    :root[data-theme="dark"] {
+      --bg: #050505;
+      --panel: #101010;
+      --panel-soft: #181818;
+      --input-bg: #080808;
+      --badge-bg: #151515;
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --label: #d4d4d8;
+      --line: #2a2a2a;
+      --primary: #60a5fa;
+      --primary-strong: #3b82f6;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --red: #fb7185;
+      --meter-bg: #262626;
+      --empty-bg: rgba(16, 16, 16, 0.72);
+      --raw-bg: #000000;
+      --raw-text: #d1d5db;
+      --shadow: 0 18px 46px rgba(0, 0, 0, 0.32);
+    }
+
+    :root[data-theme="light"] {
+      color-scheme: light;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -34,11 +93,7 @@
       letter-spacing: 0;
     }
 
-    button,
-    input,
-    select {
-      font: inherit;
-    }
+    button, input, select { font: inherit; }
 
     .app {
       width: min(1180px, calc(100vw - 32px));
@@ -96,25 +151,23 @@
     label {
       display: grid;
       gap: 7px;
-      color: #344054;
+      color: var(--label);
       font-size: 13px;
       font-weight: 650;
     }
 
-    input,
-    select {
+    input, select {
       width: 100%;
       min-height: 42px;
       border: 1px solid var(--line);
       border-radius: 6px;
-      background: #fff;
+      background: var(--input-bg);
       color: var(--text);
       padding: 9px 11px;
       outline: none;
     }
 
-    input:focus,
-    select:focus {
+    input:focus, select:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
@@ -146,28 +199,24 @@
       transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
     }
 
-    .button:active {
-      transform: translateY(1px);
-    }
+    .button:active { transform: translateY(1px); }
 
     .primary {
       color: #fff;
       background: var(--primary);
     }
 
-    .primary:hover {
-      background: var(--primary-strong);
-    }
+    .primary:hover { background: var(--primary-strong); }
 
     .secondary {
       color: var(--text);
-      background: #fff;
+      background: var(--input-bg);
       border-color: var(--line);
     }
 
     .secondary:hover {
-      border-color: #a9b4c5;
-      background: #f8fafc;
+      border-color: var(--primary);
+      background: var(--panel-soft);
     }
 
     .status {
@@ -227,7 +276,7 @@
       border-radius: 999px;
       border: 1px solid var(--line);
       padding: 4px 10px;
-      background: #fff;
+      background: var(--badge-bg);
       color: var(--muted);
       font-size: 12px;
       font-weight: 700;
@@ -273,9 +322,7 @@
       overflow-wrap: anywhere;
     }
 
-    .section {
-      padding: 16px 18px 18px;
-    }
+    .section { padding: 16px 18px 18px; }
 
     .section h2 {
       margin: 0 0 12px;
@@ -283,10 +330,38 @@
       line-height: 1.3;
     }
 
-    .grid-2 {
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-head h2 {
+      margin-bottom: 0;
+    }
+
+    .section-head .subtle {
+      text-align: right;
+    }
+
+    .usage-panels {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
       gap: 18px;
+    }
+
+    .table-scroll {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .table-scroll table {
+      min-width: 620px;
     }
 
     table {
@@ -295,8 +370,7 @@
       font-size: 13px;
     }
 
-    th,
-    td {
+    th, td {
       border-bottom: 1px solid var(--line);
       padding: 10px 8px;
       text-align: left;
@@ -310,8 +384,7 @@
       background: var(--panel-soft);
     }
 
-    td.num,
-    th.num {
+    td.num, th.num {
       text-align: right;
       font-variant-numeric: tabular-nums;
     }
@@ -320,7 +393,7 @@
       height: 8px;
       width: 100%;
       border-radius: 999px;
-      background: #e7ebf2;
+      background: var(--meter-bg);
       overflow: hidden;
     }
 
@@ -332,13 +405,78 @@
       background: var(--primary);
     }
 
+    .rate-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .rate-row {
+      display: grid;
+      grid-template-columns: 54px minmax(180px, 1fr) minmax(138px, auto);
+      gap: 12px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+      padding: 12px;
+    }
+
+    .rate-window {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      border-radius: 6px;
+      background: var(--badge-bg);
+      color: var(--text);
+      font-weight: 760;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .rate-main {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .rate-usage {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 750;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .rate-remaining {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .rate-row .meter {
+      height: 10px;
+    }
+
+    .rate-reset {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
     .empty {
       border: 1px dashed #bac4d3;
       border-radius: 8px;
       padding: 26px;
       text-align: center;
       color: var(--muted);
-      background: rgba(255, 255, 255, 0.55);
+      background: var(--empty-bg);
     }
 
     .raw {
@@ -347,8 +485,8 @@
       margin: 0;
       border-radius: 8px;
       border: 1px solid var(--line);
-      background: #111827;
-      color: #d1d5db;
+      background: var(--raw-bg);
+      color: var(--raw-text);
       padding: 14px;
       font-size: 12px;
       line-height: 1.55;
@@ -356,25 +494,16 @@
       overflow-wrap: anywhere;
     }
 
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
     @media (max-width: 880px) {
-      .topbar,
-      .shell,
-      .grid-2 {
+      .topbar, .shell, .usage-panels {
         display: grid;
         grid-template-columns: 1fr;
       }
 
-      .query {
-        position: static;
-      }
-
-      .stats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+      .query { position: static; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 
     @media (max-width: 520px) {
@@ -383,15 +512,16 @@
         padding-top: 18px;
       }
 
-      .inline,
-      .stats {
-        grid-template-columns: 1fr;
+      .inline, .stats { grid-template-columns: 1fr; }
+      .rate-row {
+        grid-template-columns: 48px minmax(0, 1fr);
       }
-
-      th,
-      td {
-        padding: 9px 6px;
+      .rate-reset {
+        grid-column: 1 / -1;
+        text-align: left;
+        white-space: normal;
       }
+      th, td { padding: 9px 6px; }
     }
   </style>
 </head>
@@ -402,7 +532,7 @@
         <h1>API Key 用量查询</h1>
         <p class="subtle">输入一个 API Key，直接调用网关的 /v1/usage 查询这个 key 自身用量。</p>
       </div>
-      <div class="badge-row" aria-label="Capabilities">
+      <div class="badge-row" aria-label="能力">
         <span class="badge">无需登录</span>
         <span class="badge">可本地预览</span>
         <span class="badge">只读查询</span>
@@ -426,9 +556,10 @@
             <label>
               查询天数
               <select id="days" name="days">
-                <option value="7">7</option>
+                <option value="1">1 天</option>
+                <option value="7" selected>7</option>
                 <option value="14">14</option>
-                <option value="30" selected>30</option>
+                <option value="30">30</option>
                 <option value="60">60</option>
                 <option value="90">90</option>
               </select>
@@ -449,6 +580,15 @@
               <input id="end-date" name="endDate" type="date">
             </label>
           </div>
+
+          <label>
+            主题
+            <select id="theme" name="theme">
+              <option value="auto" selected>跟随系统</option>
+              <option value="light">白色主题</option>
+              <option value="dark">黑色主题</option>
+            </select>
+          </label>
 
           <div class="actions">
             <button class="button primary" type="submit">查询</button>
@@ -476,7 +616,20 @@
           </div>
         </section>
 
-        <div class="grid-2">
+        <section class="panel section">
+          <div class="section-head">
+            <h2 id="range-title">查询范围统计</h2>
+            <p id="range-subtitle" class="subtle">默认查询最近 7 天；选择 1 天可查看单日统计。</p>
+          </div>
+          <div id="range-stats" class="stats">
+            <div class="stat"><div class="label">范围请求</div><div class="value">-</div></div>
+            <div class="stat"><div class="label">范围 Tokens</div><div class="value">-</div></div>
+            <div class="stat"><div class="label">范围费用</div><div class="value">-</div></div>
+            <div class="stat"><div class="label">日均请求</div><div class="value">-</div></div>
+          </div>
+        </section>
+
+        <div class="usage-panels">
           <section class="panel section">
             <h2>限速额度</h2>
             <div id="rate-limits" class="empty">暂无限速数据。</div>
@@ -506,310 +659,6 @@
     </div>
   </main>
 
-  <script>
-    const $ = (id) => document.getElementById(id);
-
-    const form = $("usage-form");
-    const statusBox = $("status");
-    const baseUrlInput = $("base-url");
-    const keyInput = $("api-key");
-    const daysInput = $("days");
-    const timezoneInput = $("timezone");
-    const startDateInput = $("start-date");
-    const endDateInput = $("end-date");
-    const isLocalFile = location.protocol === "file:";
-
-    function defaultBaseUrl() {
-      if (location.protocol === "http:" || location.protocol === "https:") {
-        return location.origin;
-      }
-      return "https://mckameila.xyz";
-    }
-
-    baseUrlInput.value = defaultBaseUrl();
-    if (isLocalFile) {
-      $("demo").classList.remove("hidden");
-      setStatus("当前是本地文件预览。浏览器会阻止 file:// 页面携带 Authorization 跨域请求线上接口；示例按钮可查看渲染效果，真实查询请通过站点 URL 打开本页。", "");
-    }
-
-    function setStatus(message, type) {
-      statusBox.textContent = message;
-      statusBox.className = "status" + (type ? " " + type : "");
-    }
-
-    function fmtNumber(value) {
-      const n = Number(value || 0);
-      return new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(n);
-    }
-
-    function fmtUsd(value) {
-      const n = Number(value || 0);
-      return "$" + n.toFixed(n >= 1 ? 4 : 6).replace(/0+$/, "").replace(/\.$/, "");
-    }
-
-    function fmtDate(value) {
-      if (!value) return "-";
-      const d = new Date(value);
-      if (Number.isNaN(d.getTime())) return String(value);
-      return d.toLocaleString();
-    }
-
-    function esc(value) {
-      return String(value == null ? "" : value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-    }
-
-    function pct(used, limit) {
-      const u = Number(used || 0);
-      const l = Number(limit || 0);
-      if (l <= 0) return 0;
-      return Math.min(100, Math.max(0, (u / l) * 100));
-    }
-
-    function buildUrl() {
-      const base = baseUrlInput.value.trim().replace(/\/+$/, "");
-      const params = new URLSearchParams();
-      params.set("days", daysInput.value || "30");
-      if (timezoneInput.value.trim()) params.set("timezone", timezoneInput.value.trim());
-      if (startDateInput.value) params.set("start_date", startDateInput.value);
-      if (endDateInput.value) params.set("end_date", endDateInput.value);
-      return base + "/v1/usage?" + params.toString();
-    }
-
-    function renderBadges(data) {
-      const badges = $("badges");
-      badges.innerHTML = "";
-      const entries = [
-        [data.isValid ? "有效" : "无效", data.isValid ? "ok" : "warn"],
-        [data.status || "unknown", data.status === "active" ? "ok" : "warn"],
-        [data.mode || "unknown", ""]
-      ];
-      for (const [text, cls] of entries) {
-        const span = document.createElement("span");
-        span.className = "badge" + (cls ? " " + cls : "");
-        span.textContent = text;
-        badges.appendChild(span);
-      }
-    }
-
-    function renderSummary(data) {
-      $("summary-title").textContent = data.status ? "Key 状态：" + data.status : "用量已加载";
-      $("summary-subtitle").textContent = "模式：" + (data.mode || "-") + " · 单位：" + (data.unit || "USD");
-
-      const usage = data.usage || {};
-      const today = usage.today || {};
-      const total = usage.total || {};
-      const stats = [
-        ["今日请求", fmtNumber(today.requests)],
-        ["今日 Tokens", fmtNumber(today.total_tokens)],
-        ["今日费用", fmtUsd(today.actual_cost)],
-        ["累计费用", fmtUsd(total.actual_cost)]
-      ];
-
-      $("stats").innerHTML = stats.map(([label, value]) => (
-        '<div class="stat"><div class="label">' + esc(label) + '</div><div class="value">' + esc(value) + '</div></div>'
-      )).join("");
-      renderBadges(data);
-    }
-
-    function renderRateLimits(data) {
-      const target = $("rate-limits");
-      const rows = Array.isArray(data.rate_limits) ? data.rate_limits : [];
-      if (!rows.length) {
-        target.className = "empty";
-        target.textContent = "暂无限速数据。";
-        return;
-      }
-      target.className = "";
-      target.innerHTML = '<table><thead><tr><th>窗口</th><th class="num">已用</th><th class="num">上限</th><th class="num">剩余</th><th>重置时间</th></tr></thead><tbody>' +
-        rows.map((row) => {
-          const width = pct(row.used, row.limit).toFixed(2);
-          return '<tr>' +
-            '<td><strong>' + esc(row.window || "-") + '</strong><div class="meter"><span style="width:' + width + '%"></span></div></td>' +
-            '<td class="num">' + fmtNumber(row.used) + '</td>' +
-            '<td class="num">' + fmtNumber(row.limit) + '</td>' +
-            '<td class="num">' + fmtNumber(row.remaining) + '</td>' +
-            '<td>' + esc(fmtDate(row.reset_at)) + '</td>' +
-          '</tr>';
-        }).join("") +
-      '</tbody></table>';
-    }
-
-    function renderQuota(data) {
-      const target = $("quota");
-      const quota = data.quota;
-      const subscription = data.subscription;
-      if (quota) {
-        target.className = "";
-        const width = pct(quota.used, quota.limit).toFixed(2);
-        target.innerHTML = '<table><tbody>' +
-          '<tr><th>总额度</th><td class="num">' + fmtUsd(quota.limit) + '</td></tr>' +
-          '<tr><th>已用</th><td class="num">' + fmtUsd(quota.used) + '</td></tr>' +
-          '<tr><th>剩余</th><td class="num">' + fmtUsd(quota.remaining) + '</td></tr>' +
-          '<tr><th>进度</th><td><div class="meter"><span style="width:' + width + '%"></span></div></td></tr>' +
-        '</tbody></table>';
-        return;
-      }
-      if (subscription) {
-        target.className = "";
-        target.innerHTML = '<table><tbody>' +
-          '<tr><th>日额度</th><td class="num">' + fmtUsd(subscription.daily_usage_usd) + ' / ' + fmtUsd(subscription.daily_limit_usd) + '</td></tr>' +
-          '<tr><th>周额度</th><td class="num">' + fmtUsd(subscription.weekly_usage_usd) + ' / ' + fmtUsd(subscription.weekly_limit_usd) + '</td></tr>' +
-          '<tr><th>月额度</th><td class="num">' + fmtUsd(subscription.monthly_usage_usd) + ' / ' + fmtUsd(subscription.monthly_limit_usd) + '</td></tr>' +
-          '<tr><th>过期时间</th><td>' + esc(fmtDate(subscription.expires_at)) + '</td></tr>' +
-        '</tbody></table>';
-        return;
-      }
-      if (typeof data.balance === "number" || typeof data.remaining === "number") {
-        target.className = "";
-        target.innerHTML = '<table><tbody>' +
-          '<tr><th>剩余</th><td class="num">' + fmtUsd(data.remaining) + '</td></tr>' +
-          '<tr><th>余额</th><td class="num">' + fmtUsd(data.balance) + '</td></tr>' +
-        '</tbody></table>';
-        return;
-      }
-      target.className = "empty";
-      target.textContent = "暂无额度数据。";
-    }
-
-    function renderDailyUsage(data) {
-      const target = $("daily-usage");
-      const rows = Array.isArray(data.daily_usage) ? data.daily_usage : [];
-      if (!rows.length) {
-        target.className = "empty";
-        target.textContent = "暂无每日用量数据。";
-        return;
-      }
-      target.className = "";
-      target.innerHTML = '<table><thead><tr><th>日期</th><th class="num">请求数</th><th class="num">Tokens</th><th class="num">实际费用</th></tr></thead><tbody>' +
-        rows.map((row) => '<tr>' +
-          '<td>' + esc(row.date || "-") + '</td>' +
-          '<td class="num">' + fmtNumber(row.requests) + '</td>' +
-          '<td class="num">' + fmtNumber(row.total_tokens) + '</td>' +
-          '<td class="num">' + fmtUsd(row.actual_cost) + '</td>' +
-        '</tr>').join("") +
-      '</tbody></table>';
-    }
-
-    function renderModelStats(data) {
-      const target = $("model-stats");
-      const rows = Array.isArray(data.model_stats) ? data.model_stats : [];
-      if (!rows.length) {
-        target.className = "empty";
-        target.textContent = "暂无模型统计数据。";
-        return;
-      }
-      target.className = "";
-      target.innerHTML = '<table><thead><tr><th>模型</th><th class="num">请求数</th><th class="num">Tokens</th><th class="num">实际费用</th></tr></thead><tbody>' +
-        rows.map((row) => '<tr>' +
-          '<td>' + esc(row.model || "-") + '</td>' +
-          '<td class="num">' + fmtNumber(row.requests) + '</td>' +
-          '<td class="num">' + fmtNumber(row.total_tokens) + '</td>' +
-          '<td class="num">' + fmtUsd(row.actual_cost) + '</td>' +
-        '</tr>').join("") +
-      '</tbody></table>';
-    }
-
-    function render(data) {
-      renderSummary(data);
-      renderRateLimits(data);
-      renderQuota(data);
-      renderDailyUsage(data);
-      renderModelStats(data);
-      $("raw").textContent = JSON.stringify(data, null, 2);
-    }
-
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const key = keyInput.value.trim();
-      if (!key) {
-        setStatus("请先输入 API Key。", "err");
-        keyInput.focus();
-        return;
-      }
-
-      const url = buildUrl();
-      setStatus("正在查询：" + url, "");
-      if (isLocalFile) {
-        setStatus("本地 file:// 页面发起带 Authorization 的跨域请求通常会被浏览器 CORS 拦截。请通过 https://mckameila.xyz/key-usage-lookup.html 打开后查询。", "err");
-        return;
-      }
-
-      try {
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Authorization": "Bearer " + key,
-            "Accept": "application/json"
-          }
-        });
-        const text = await response.text();
-        let data;
-        try {
-          data = text ? JSON.parse(text) : {};
-        } catch (err) {
-          throw new Error("HTTP " + response.status + ": " + text);
-        }
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status + ": " + JSON.stringify(data));
-        }
-        render(data);
-        setStatus("查询成功。HTTP " + response.status + "。", "ok");
-      } catch (err) {
-        setStatus(err && err.message ? err.message : String(err), "err");
-      }
-    });
-
-    $("demo").addEventListener("click", () => {
-      const now = new Date();
-      const date = (offset) => {
-        const d = new Date(now);
-        d.setDate(d.getDate() + offset);
-        return d.toISOString().slice(0, 10);
-      };
-      const demo = {
-        isValid: true,
-        mode: "quota_limited",
-        status: "active",
-        unit: "USD",
-        rate_limits: [
-          { window: "5h", limit: 10, used: 2.4, remaining: 7.6, reset_at: new Date(now.getTime() + 2 * 3600 * 1000).toISOString() },
-          { window: "1d", limit: 100, used: 18.9, remaining: 81.1, reset_at: new Date(now.getTime() + 12 * 3600 * 1000).toISOString() },
-          { window: "7d", limit: 1000, used: 143.6, remaining: 856.4, reset_at: new Date(now.getTime() + 4 * 86400 * 1000).toISOString() }
-        ],
-        quota: { limit: 50, used: 8.75, remaining: 41.25, unit: "USD" },
-        usage: {
-          average_duration_ms: 824,
-          rpm: 0.6,
-          tpm: 1842,
-          today: { requests: 12, input_tokens: 24800, output_tokens: 5100, cache_creation_tokens: 600, cache_read_tokens: 2200, total_tokens: 32700, cost: 0.82, actual_cost: 0.41 },
-          total: { requests: 186, input_tokens: 382000, output_tokens: 80100, cache_creation_tokens: 12600, cache_read_tokens: 48200, total_tokens: 522900, cost: 13.48, actual_cost: 6.74 }
-        },
-        daily_usage: [
-          { date: date(-2), requests: 36, total_tokens: 96400, actual_cost: 1.18 },
-          { date: date(-1), requests: 28, total_tokens: 72100, actual_cost: 0.86 },
-          { date: date(0), requests: 12, total_tokens: 32700, actual_cost: 0.41 }
-        ],
-        model_stats: [
-          { model: "claude-sonnet-4", requests: 112, total_tokens: 338100, actual_cost: 4.32 },
-          { model: "gpt-5-codex", requests: 74, total_tokens: 184800, actual_cost: 2.42 }
-        ]
-      };
-      render(demo);
-      setStatus("已加载示例数据，可用于本地预览。", "ok");
-    });
-
-    $("clear").addEventListener("click", () => {
-      keyInput.value = "";
-      startDateInput.value = "";
-      endDateInput.value = "";
-      $("raw").textContent = "{}";
-      setStatus("已清空。", "");
-    });
-  </script>
+  <script src="./key-usage-lookup.js"></script>
 </body>
 </html>

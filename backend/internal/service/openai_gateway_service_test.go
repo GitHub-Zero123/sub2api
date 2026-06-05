@@ -1233,6 +1233,85 @@ func TestOpenAIStreamingPreambleKeepaliveUsesDownstreamIdle(t *testing.T) {
 	require.Contains(t, rec.Body.String(), "response.completed")
 }
 
+func TestOpenAIStreamingNormalizesTerminalOutputFromDeltas(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	cfg := &config.Config{
+		Gateway: config.GatewayConfig{
+			StreamDataIntervalTimeout: 0,
+			StreamKeepaliveInterval:   0,
+			MaxLineSize:               defaultMaxLineSize,
+		},
+	}
+	svc := &OpenAIGatewayService{cfg: cfg}
+
+	rec := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(rec)
+	c.Request = httptest.NewRequest(http.MethodPost, "/", nil)
+
+	resp := &http.Response{
+		StatusCode: http.StatusOK,
+		Body: io.NopCloser(strings.NewReader(strings.Join([]string{
+			`data: {"type":"response.created","response":{"id":"resp_sdk_parse"}}`,
+			"",
+			`data: {"type":"response.output_text.delta","delta":"pon"}`,
+			"",
+			`data: {"type":"response.output_text.delta","delta":"g"}`,
+			"",
+			`data: {"type":"response.completed","response":{"id":"resp_sdk_parse","status":"completed","output":null,"usage":{"input_tokens":1,"output_tokens":1}}}`,
+			"",
+		}, "\n"))),
+		Header: http.Header{"X-Request-Id": []string{"rid-sdk-parse"}},
+	}
+
+	result, err := svc.handleStreamingResponse(c.Request.Context(), resp, c, &Account{ID: 1, Platform: PlatformOpenAI, Name: "acc"}, time.Now(), "model", "model")
+	require.NoError(t, err)
+	require.NotNil(t, result)
+
+	terminalType, terminalPayload, ok := extractOpenAISSETerminalEvent(rec.Body.String())
+	require.True(t, ok)
+	require.Equal(t, "response.completed", terminalType)
+	output := gjson.GetBytes(terminalPayload, "response.output")
+	require.True(t, output.IsArray())
+	require.Len(t, output.Array(), 1)
+	require.Equal(t, "pong", gjson.GetBytes(terminalPayload, "response.output.0.content.0.text").String())
+}
+
+func TestOpenAIStreamingNormalizesTerminalOutputToEmptyArray(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	cfg := &config.Config{
+		Gateway: config.GatewayConfig{
+			StreamDataIntervalTimeout: 0,
+			StreamKeepaliveInterval:   0,
+			MaxLineSize:               defaultMaxLineSize,
+		},
+	}
+	svc := &OpenAIGatewayService{cfg: cfg}
+
+	rec := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(rec)
+	c.Request = httptest.NewRequest(http.MethodPost, "/", nil)
+
+	resp := &http.Response{
+		StatusCode: http.StatusOK,
+		Body: io.NopCloser(strings.NewReader(strings.Join([]string{
+			`data: {"type":"response.completed","response":{"id":"resp_empty","status":"completed","output":null,"usage":{"input_tokens":1,"output_tokens":0}}}`,
+			"",
+		}, "\n"))),
+		Header: http.Header{"X-Request-Id": []string{"rid-empty-output"}},
+	}
+
+	result, err := svc.handleStreamingResponse(c.Request.Context(), resp, c, &Account{ID: 1, Platform: PlatformOpenAI, Name: "acc"}, time.Now(), "model", "model")
+	require.NoError(t, err)
+	require.NotNil(t, result)
+
+	terminalType, terminalPayload, ok := extractOpenAISSETerminalEvent(rec.Body.String())
+	require.True(t, ok)
+	require.Equal(t, "response.completed", terminalType)
+	output := gjson.GetBytes(terminalPayload, "response.output")
+	require.True(t, output.IsArray())
+	require.Len(t, output.Array(), 0)
+}
+
 func TestOpenAIStreamingPolicyResponseFailedBeforeOutputPassesThrough(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	cfg := &config.Config{
@@ -2217,6 +2296,12 @@ func TestParseSSEUsage_SelectiveParsing(t *testing.T) {
 	require.Equal(t, 13, usage.InputTokens)
 	require.Equal(t, 15, usage.OutputTokens)
 	require.Equal(t, 4, usage.CacheReadInputTokens)
+
+	// failed 事件在部分上游路径也会携带已消耗 usage，应与 WS/passthrough 保持一致
+	svc.parseSSEUsage(`{"type":"response.failed","response":{"usage":{"input_tokens":17,"output_tokens":19,"input_tokens_details":{"cached_tokens":6}}}}`, usage)
+	require.Equal(t, 17, usage.InputTokens)
+	require.Equal(t, 19, usage.OutputTokens)
+	require.Equal(t, 6, usage.CacheReadInputTokens)
 
 	svc.parseSSEUsage(`{"type":"response.completed","response":{"usage":{"prompt_tokens":21,"completion_tokens":8,"prompt_tokens_details":{"cached_tokens":6}}}}`, usage)
 	require.Equal(t, 21, usage.InputTokens)

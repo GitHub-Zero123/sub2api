@@ -31,9 +31,14 @@ RUN corepack enable && corepack prepare pnpm@9 --activate
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
-# Copy frontend source and build
-# Use build:no-check to skip vue-tsc type checking (saves ~400MB heap on low-memory servers)
+# Copy frontend source and build.
+# LegalDocumentView.vue (admin-compliance gate) build-time imports
+# ../../../../docs/legal/*.md?raw, so docs/legal/ must sit beside frontend/
+# in the image (WORKDIR /app/frontend -> resolves to /app/docs/legal/*.md).
+# Copy only that subtree to keep the build dependency minimal.
+# Use build:no-check to skip vue-tsc type checking (saves ~400MB heap on low-memory servers).
 COPY frontend/ ./
+COPY docs/legal/ /app/docs/legal/
 RUN NODE_OPTIONS="--max-old-space-size=1536" pnpm run build:no-check
 
 # -----------------------------------------------------------------------------

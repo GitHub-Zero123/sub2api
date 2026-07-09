@@ -20,11 +20,46 @@ describe('API Client', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllEnvs()
   })
 
   // --- 请求拦截器 ---
 
   describe('请求拦截器', () => {
+    it('规范化相对 API base，避免在回调页拼出相对 v1 路径', async () => {
+      vi.resetModules()
+      vi.stubEnv('VITE_API_BASE_URL', 'api/v1')
+
+      const mod = await import('@/api/client')
+
+      expect(mod.apiClient.defaults.baseURL).toBe('/api/v1')
+      expect(mod.buildApiUrl('/auth/oauth/github/callback?code=abc')).toBe(
+        '/api/v1/auth/oauth/github/callback?code=abc'
+      )
+    })
+
+    it('保留子路径部署的 API 与网关前缀', async () => {
+      vi.resetModules()
+      vi.stubEnv('VITE_API_BASE_URL', '/dev-ai/api/v1')
+
+      const mod = await import('@/api/client')
+
+      expect(mod.apiClient.defaults.baseURL).toBe('/dev-ai/api/v1')
+      expect(mod.buildApiUrl('/api/v1/auth/me')).toBe('/dev-ai/api/v1/auth/me')
+      expect(mod.buildGatewayUrl('/setup/status')).toBe(
+        `${window.location.origin}/dev-ai/setup/status`
+      )
+    })
+
+    it('非标准 API 路径沿用上游的网关根地址语义', async () => {
+      vi.resetModules()
+      vi.stubEnv('VITE_API_BASE_URL', '/backend')
+
+      const mod = await import('@/api/client')
+
+      expect(mod.buildGatewayUrl('/v1/models')).toBe(`${window.location.origin}/v1/models`)
+    })
+
     it('自动附加 Authorization 头', async () => {
       localStorage.setItem('auth_token', 'my-jwt-token')
 

@@ -2,12 +2,11 @@
  * Setup API endpoints
  */
 import axios from 'axios'
+import { buildGatewayUrl } from './url'
 
 // Create a separate client for setup endpoints (not under /api/v1)
-// Use the router base path so /dev-ai/setup/* maps correctly under subpath deployment.
-const BASE_URL = import.meta.env.BASE_URL || '/'
 const setupClient = axios.create({
-  baseURL: BASE_URL,
+  baseURL: buildGatewayUrl('/').replace(/\/+$/, ''),
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json'

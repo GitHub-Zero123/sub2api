@@ -17,9 +17,46 @@
       <div>
         <p class="text-xs font-medium text-[var(--app-text-muted)]">{{ t('usage.totalTokens') }}</p>
         <p class="text-xl font-bold text-[var(--app-text)]">{{ formatTokens(stats?.total_tokens || 0) }}</p>
-        <p class="text-xs text-[var(--app-text-soft)]">
-          {{ t('usage.in') }}: {{ formatTokens(stats?.total_input_tokens || 0) }} /
-          {{ t('usage.out') }}: {{ formatTokens(stats?.total_output_tokens || 0) }}
+        <p class="flex flex-wrap items-center gap-x-1 text-xs text-[var(--app-text-soft)]">
+          <span>{{ t('usage.in') }}: {{ formatTokens(stats?.total_input_tokens || 0) }}</span>
+          <span>/</span>
+          <span>{{ t('usage.out') }}: {{ formatTokens(stats?.total_output_tokens || 0) }}</span>
+          <span>/</span>
+          <span class="group relative inline-flex cursor-help items-center gap-0.5" tabindex="0">
+            <span>{{ cacheLabel() }}: {{ formatTokens(stats?.total_cache_tokens || 0) }}</span>
+            <svg
+              class="h-3.5 w-3.5 text-[var(--app-text-muted)]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span
+              class="pointer-events-none absolute left-1/2 top-full z-30 mt-2 w-56 -translate-x-1/2 rounded-lg border border-gray-200 bg-white p-3 text-left text-xs text-[var(--app-text-soft)] opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100 dark:border-dark-600 dark:bg-dark-800"
+            >
+              <span class="mb-2 block font-medium text-[var(--app-text)]">
+                {{ cacheDetailLabel() }}
+              </span>
+              <span class="flex items-center justify-between gap-3">
+                <span>{{ t('usage.cacheCreationTokensLabel') }}</span>
+                <span class="tabular-nums">
+                  {{ formatTokens(stats?.total_cache_creation_tokens || 0) }}
+                </span>
+              </span>
+              <span class="mt-1 flex items-center justify-between gap-3">
+                <span>{{ t('usage.cacheReadTokensLabel') }}</span>
+                <span class="tabular-nums">
+                  {{ formatTokens(stats?.total_cache_read_tokens || 0) }}
+                </span>
+              </span>
+            </span>
+          </span>
         </p>
       </div>
     </div>
@@ -30,17 +67,23 @@
       <div class="min-w-0 flex-1">
         <p class="text-xs font-medium text-[var(--app-text-muted)]">{{ t('usage.totalCost') }}</p>
         <p class="text-xl font-bold text-[var(--app-text)]">
-          ${{ ((stats?.total_account_cost ?? stats?.total_actual_cost) || 0).toFixed(4) }}
+          ${{ displayCost.toFixed(4) }}
         </p>
-        <p class="text-xs text-[var(--app-text-muted)]" v-if="stats?.total_account_cost != null">
-          {{ t('usage.userBilled') }}:
-          <span class="text-[var(--app-text-soft)]">${{ (stats?.total_actual_cost || 0).toFixed(4) }}</span>
-          · {{ t('usage.standardCost') }}:
-          <span class="text-[var(--app-text-soft)]">${{ (stats?.total_cost || 0).toFixed(4) }}</span>
-        </p>
-        <p class="text-xs text-[var(--app-text-muted)]" v-else>
-          {{ t('usage.standardCost') }}:
-          <span class="line-through text-[var(--app-text-soft)]">${{ (stats?.total_cost || 0).toFixed(4) }}</span>
+        <p class="text-xs text-[var(--app-text-muted)]">
+          <template v-if="showAccountCost && totalAccountCost != null">
+            <span>
+              {{ t('usage.userBilled') }}:
+              <span class="text-[var(--app-text-soft)]">${{ (stats?.total_actual_cost || 0).toFixed(4) }}</span>
+            </span>
+            <span aria-hidden="true">&middot;</span>
+          </template>
+          <span>
+            {{ t('usage.standardCost') }}:
+            <span
+              class="text-[var(--app-text-soft)]"
+              :class="{ 'line-through': strikeStandardCost || (showAccountCost && totalAccountCost == null) }"
+            >${{ (stats?.total_cost || 0).toFixed(4) }}</span>
+          </span>
         </p>
       </div>
     </div>
@@ -57,13 +100,34 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { AdminUsageStatsResponse } from '@/api/admin/usage'
+import type { UsageStatsResponse } from '@/types'
 import Icon from '@/components/icons/Icon.vue'
 
-defineProps<{ stats: AdminUsageStatsResponse | null }>()
+const props = withDefaults(defineProps<{
+  stats: (AdminUsageStatsResponse | UsageStatsResponse) | null
+  showAccountCost?: boolean
+  strikeStandardCost?: boolean
+}>(), {
+  showAccountCost: true,
+  strikeStandardCost: false,
+})
 
 const { t } = useI18n()
+
+const totalAccountCost = computed(() => {
+  const stats = props.stats as (AdminUsageStatsResponse & { total_account_cost?: number }) | null
+  return stats?.total_account_cost ?? null
+})
+const showAccountCost = computed(() => props.showAccountCost)
+const strikeStandardCost = computed(() => props.strikeStandardCost)
+const displayCost = computed(() =>
+  showAccountCost.value && totalAccountCost.value != null
+    ? totalAccountCost.value
+    : props.stats?.total_actual_cost || 0
+)
 
 const formatDuration = (ms: number) =>
   ms < 1000 ? `${ms.toFixed(0)}ms` : `${(ms / 1000).toFixed(2)}s`
@@ -74,4 +138,7 @@ const formatTokens = (value: number) => {
   if (value >= 1e3) return (value / 1e3).toFixed(2) + 'K'
   return value.toLocaleString()
 }
+
+const cacheLabel = () => t('usage.cacheTotal')
+const cacheDetailLabel = () => t('usage.cacheBreakdown')
 </script>
